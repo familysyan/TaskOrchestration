@@ -7,13 +7,18 @@ import java.util.concurrent.FutureTask;
 import github.familysyan.concurrent.tasks.exceptions.ExecutorDownException;
 
 public class TaskExecutor {
-	
+
 	private ExecutorService executor;
-	
+
 	public TaskExecutor() {
-		
+
 	}
-	
+
+	/**
+	 * @param executor
+	 *            customized ExecutorService. if null, a cached thread pool will
+	 *            be used as default executor.
+	 */
 	public TaskExecutor(ExecutorService executor) {
 		if (executor == null) {
 			this.executor = Executors.newCachedThreadPool();
@@ -22,6 +27,10 @@ public class TaskExecutor {
 		}
 	}
 
+	/**
+	 * Execute future task. Will throw runtime exception if the executor has already been shutdown.
+	 * @param futureTask the future task to be executed
+	 */
 	public void executeTask(FutureTask<?> futureTask) {
 		if (futureTask != null) {
 			if (executor == null || executor.isShutdown()) {
@@ -31,7 +40,10 @@ public class TaskExecutor {
 			}
 		}
 	}
-	
+
+	/**
+	 * Shut down the executor
+	 */
 	public void shutdown() {
 		executor.shutdown();
 	}

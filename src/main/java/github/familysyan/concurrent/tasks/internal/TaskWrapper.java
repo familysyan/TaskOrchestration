@@ -25,16 +25,29 @@ public class TaskWrapper extends Observable implements Callable{
 		return task;
 	}
 	
+	/**
+	 * Returns true if this task is ready to be executed. Otherwise returns false.
+	 * @return true/false
+	 */
 	public boolean isReady() {
 		return ready;
 	}
 	
+	/**
+	 * Add dependency of this task.
+	 * @param dependencyId The id of the dependency task.
+	 */
 	public void addDependency(String dependencyId) {
 		dependencies.add(dependencyId);
 		ready = false;
 	}
 	
-	public void dependencyReady(String dependencyId, Object dependencyResult) {
+	/**
+	 * This method will be called when some dependency has successfully finished execution.
+	 * @param dependencyId The id of the finished dependency.
+	 * @param dependencyResult The execution result of the finished dependency.
+	 */
+	public void fulfillDependency(String dependencyId, Object dependencyResult) {
 		dependencies.remove(dependencyId);
 		dependencyResults.add(dependencyResult);
 		if (dependencies.isEmpty()) {

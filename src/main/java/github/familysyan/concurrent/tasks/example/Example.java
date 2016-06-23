@@ -1,6 +1,7 @@
 package github.familysyan.concurrent.tasks.example;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import github.familysyan.concurrent.tasks.TaskConfiguration;
@@ -20,7 +21,7 @@ public class Example {
 		orchestrator.shutdown();
 		
 		try {
-			int count = (Integer) orchestrator.getTaskResult(task2.getUniqueTaskId(), 1000);
+			int count = (Integer) orchestrator.getTaskResult(task2.getUniqueTaskId(), 1000, TimeUnit.MILLISECONDS);
 			System.out.println(count);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

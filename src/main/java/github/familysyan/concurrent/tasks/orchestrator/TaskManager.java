@@ -73,7 +73,7 @@ public class TaskManager implements Observer{
 			FutureTask<?> targetResult = results.get(target);
 			if (targetResult.isDone()) {
 				try {
-					internalTask.dependencyReady(target, targetResult.get());
+					internalTask.fulfillDependency(target, targetResult.get());
 				} catch (InterruptedException e) {
 
 				} catch (ExecutionException e) {
@@ -97,7 +97,7 @@ public class TaskManager implements Observer{
 			for (DefaultEdge edge : incomingEdges) {
 				String source = graph.getEdgeSource(edge);
 				TaskWrapper task = internalTasks.get(source);
-				task.dependencyReady(finishedTask.getTask().getUniqueTaskId(), arg);
+				task.fulfillDependency(finishedTask.getTask().getUniqueTaskId(), arg);
 				if (task.isReady()) {
 					taskExecutor.executeTask(results.get(task.getTask().getUniqueTaskId()));
 				}
