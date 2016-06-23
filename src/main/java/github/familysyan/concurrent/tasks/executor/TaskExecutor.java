@@ -11,7 +11,7 @@ public class TaskExecutor {
 	private ExecutorService executor;
 
 	public TaskExecutor() {
-
+		this.executor = Executors.newCachedThreadPool();
 	}
 
 	/**
