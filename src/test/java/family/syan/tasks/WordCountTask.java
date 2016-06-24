@@ -1,4 +1,4 @@
-package github.familysyan.concurrent.tasks.example;
+package family.syan.tasks;
 
 import java.util.List;
 import java.util.StringTokenizer;
@@ -14,9 +14,13 @@ public class WordCountTask implements Task<Integer>{
 
 	public Integer execute(List<Object> dependencies) {
 		if (dependencies != null && dependencies.size() > 0) {
-			String words = (String) dependencies.get(0);
-			StringTokenizer t = new StringTokenizer(words);
-			return t.countTokens();
+			int count = 0;
+			for (Object dependency : dependencies) {
+				String words = (String) dependency;
+				StringTokenizer t = new StringTokenizer(words);
+				count = count + t.countTokens();
+			}
+			return count;
 		} else {
 			return -1;
 		}

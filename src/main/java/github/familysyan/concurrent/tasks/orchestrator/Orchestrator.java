@@ -79,6 +79,12 @@ public class Orchestrator {
 		Future<?> future = taskManager.getTaskResultFuture(uniqueTaskId);
 		return future.get(timeout, timeUnit);
 	}
+	
+	public Object getTaskResult(String uniqueTaskId)
+			throws InterruptedException, ExecutionException, TimeoutException {
+		Future<?> future = taskManager.getTaskResultFuture(uniqueTaskId);
+		return future.get();
+	}
 
 	/**
 	 * Submit the task to the orchestrator. The task will be automatically

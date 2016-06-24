@@ -1,38 +1,96 @@
 package family.syan.tasks;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.*;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.junit.Test;
+
+import github.familysyan.concurrent.tasks.TaskConfiguration;
+import github.familysyan.concurrent.tasks.orchestrator.Orchestrator;
+import github.familysyan.concurrent.tasks.orchestrator.OrchestratorFactory;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+public class AppTest {
+	
+	@Test
+	public void testNormalCase() {
+		Orchestrator orchestrator = new Orchestrator.Builder().setShutdownWhenIdle(false).build();
+		OrchestratorFactory.setOrchestrator(orchestrator);
+		GenerateWordsTask task1 = new GenerateWordsTask();
+		orchestrator.acceptTask(task1);
+		WordCountTask task2 = new WordCountTask();
+		TaskConfiguration tc = new TaskConfiguration(task2).addDependency(task1);
+		orchestrator.acceptTask(task2, tc);
+		try {
+			int count = (Integer) orchestrator.getTaskResult(task2.getUniqueTaskId(), 1000, TimeUnit.MILLISECONDS);
+			assertTrue(count == 2);
+			orchestrator.shutdown();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testLongTask() {
+		Orchestrator orchestrator = new Orchestrator.Builder().setShutdownWhenIdle(true).build();
+		OrchestratorFactory.setOrchestrator(orchestrator);
+		LongTask task1 = new LongTask();
+		orchestrator.acceptTask(task1);
+		WordCountTask task2 = new WordCountTask();
+		TaskConfiguration tc = new TaskConfiguration(task2).addDependency(task1);
+		orchestrator.acceptTask(task2, tc);
+		try {
+			int count = (Integer) orchestrator.getTaskResult(task2.getUniqueTaskId());
+			assertEquals(count, 5);
+			orchestrator.shutdown();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testMultipleDependency() {
+		Orchestrator orchestrator = new Orchestrator.Builder().setShutdownWhenIdle(true).build();
+		OrchestratorFactory.setOrchestrator(orchestrator);
+		LongTask task1 = new LongTask();
+		orchestrator.acceptTask(task1);
+		GenerateWordsTask task2 = new GenerateWordsTask();
+		orchestrator.acceptTask(task2);
+		WordCountTask task3 = new WordCountTask();
+		TaskConfiguration tc = new TaskConfiguration(task3).addDependency(task1).addDependency(task2);
+		orchestrator.acceptTask(task3, tc);
+		try {
+			int count = (Integer) orchestrator.getTaskResult(task3.getUniqueTaskId());
+			assertEquals(count, 7);
+			orchestrator.shutdown();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

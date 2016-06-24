@@ -1,4 +1,4 @@
-package github.familysyan.concurrent.tasks.example;
+package family.syan.tasks;
 
 import java.util.List;
 

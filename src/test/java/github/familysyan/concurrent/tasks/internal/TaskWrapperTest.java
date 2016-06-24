@@ -30,7 +30,7 @@ public class TaskWrapperTest extends TestCase {
 	};
 	
 	@Test
-	public void test1() {
+	public void testGetTask() {
 		TaskWrapper tWrapper = new TaskWrapper(t);
 		assertTrue(tWrapper.getTask() == t);
 	}
@@ -42,7 +42,7 @@ public class TaskWrapperTest extends TestCase {
 	}
 	
 	@Test
-	public void test3() {
+	public void testIsReady() {
 		TaskWrapper tWrapper = new TaskWrapper(t);
 		assertTrue(tWrapper.isReady());
 		tWrapper.addDependency("some other task");
@@ -50,7 +50,7 @@ public class TaskWrapperTest extends TestCase {
 	}
 	
 	@Test
-	public void test4() {
+	public void testIsReady2() {
 		TaskWrapper tWrapper = new TaskWrapper(t);
 		tWrapper.addDependency("some other task");
 		assertFalse(tWrapper.isReady());
@@ -60,7 +60,7 @@ public class TaskWrapperTest extends TestCase {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void test5() throws InterruptedException, ExecutionException {
+	public void testNotifyGetCalled() throws InterruptedException, ExecutionException {
 		TaskWrapper tWrapper = new TaskWrapper(t);
 		ObserverForTest observer = new ObserverForTest();
 		tWrapper.addObserver(observer);
@@ -68,7 +68,7 @@ public class TaskWrapperTest extends TestCase {
 		FutureTask<Integer> task = new FutureTask<Integer>(tWrapper);
 		executor.execute(task);
 		assertTrue(1 == task.get());
-		assertTrue(1 == observer.state);
+		assertTrue("TaskWrapper did not call \"notify()\"", 1 == observer.state);
 	}
 	
 	private static class ObserverForTest implements Observer {
