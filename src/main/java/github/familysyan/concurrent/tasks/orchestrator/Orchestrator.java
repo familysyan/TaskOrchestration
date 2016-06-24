@@ -2,6 +2,7 @@ package github.familysyan.concurrent.tasks.orchestrator;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -14,45 +15,44 @@ public class Orchestrator {
 
 	private TaskExecutor taskExecutor;
 	private TaskManager taskManager;
-	private boolean initialized = false;
-	private ExecutorService executorService;
-	private boolean shutdownExecutorWhenIdle = true;
-
-	/**
-	 * Initialize this orchestrator with provided settings if not already
-	 * initialized.
-	 */
-	public void initialize() {
-		if (!initialized) {
-			taskExecutor = new TaskExecutor(executorService);
-			taskManager = new TaskManager(taskExecutor, shutdownExecutorWhenIdle);
-			initialized = true;
+	
+	private Orchestrator(Builder builder) {
+		this.taskExecutor = new TaskExecutor(builder.executorService);
+		this.taskManager = new TaskManager(taskExecutor, builder.shutdownWhenIdle);
+	}
+	
+	public static class Builder {
+		
+		private boolean shutdownWhenIdle;
+		private ExecutorService executorService;
+		
+		public Builder() {
+			this.executorService = Executors.newCachedThreadPool();
 		}
-	}
+		
+		/**
+		 * @param executorService The customized ExecutorService
+		 */
+		public Builder(ExecutorService executorService) {
+			this.executorService = executorService;
+		}
 
-	/**
-	 * Accept customized ExecutorService that will be used for task execution.
-	 * 
-	 * @param executorService
-	 *            The customized ExecutorService.
-	 * @return
-	 */
-	public Orchestrator setExecutorService(ExecutorService executorService) {
-		this.executorService = executorService;
-		return this;
-	}
-
-	/**
-	 * Automatically shutdown the orchestrator when all submitted tasks are
-	 * finished. </br>
-	 * Mainly useful for long tasks.</br>
-	 * Use with caution when tasks are short.
-	 * 
-	 * @param shutdownWhenIdle
-	 */
-	public Orchestrator shutdownWhenIdle(boolean shutdownWhenIdle) {
-		this.shutdownExecutorWhenIdle = shutdownWhenIdle;
-		return this;
+		/**
+		 * Automatically shutdown the orchestrator when all submitted tasks are
+		 * finished. </br>
+		 * Mainly useful for long tasks.</br>
+		 * Use with caution when tasks are short.
+		 * 
+		 * @param shutdownWhenIdle
+		 */
+		public Builder setShutdownWhenIdle(boolean shutdownWhenIdle) {
+			this.shutdownWhenIdle = shutdownWhenIdle;
+			return this;
+		}
+		
+		public Orchestrator build() {
+			return new Orchestrator(this);
+		}
 	}
 
 	/**

@@ -11,10 +11,14 @@ public class OrchestratorFactory {
 	public static Orchestrator getOrchestrator() {
 		Orchestrator orchestrator = store.get();
 		if (orchestrator == null) {
-			orchestrator = new Orchestrator();
+			orchestrator = new Orchestrator.Builder().build();
 			store.set(orchestrator);
 		}
 		return orchestrator;
+	}
+	
+	public static void setOrchestrator(Orchestrator orchestrator) {
+		store.set(orchestrator);
 	}
 
 }
