@@ -1,9 +1,9 @@
 TaskOrchestration
 =============
 
-This project is to help manage the execution of runnable tasks. A task can have dependency on other tasks and it will be executed only when all of its dependencies have been finished.
+This project is to help manage the execution of runnable tasks. A task can have dependencies on other tasks and it will be executed only when all of its dependencies have been finished.
 
-A DAG graph is used to manage the dependency of tasks. The DAG graph used in this project is [JGrapht](http://jgrapht.org/)
+A DAG graph is used to manage the relation of tasks. The DAG graph used in this project is [JGrapht](http://jgrapht.org/)
 
 ### Example
 #### Create a task
@@ -68,6 +68,11 @@ try {
 	// TODO Auto-generated catch block
 	e.printStackTrace();
 }
+```
+#### Provide your customized ExecutorService
+The default ExecutorService is newCachedThreadPool. You can provide your customized ExecutorService
+```Java
+Orchestrator orchestrator = new Orchestrator.Builder(YOUR_CUSTOMIZED_EXECUTOR).build(); 
 ```
 
 ### Contribute to this project
