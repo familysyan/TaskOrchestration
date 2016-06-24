@@ -48,7 +48,7 @@ public class WordCountTask implements Task<Integer>{
 #### Start orchestrating
 ```Java
 Orchestrator orchestrator = new Orchestrator.Builder().setShutdownWhenIdle(false).build(); // Create an orchestrator
-OrchestratorFactory.setOrchestrator(orchestrator); // Make the orchestrator shareable 
+OrchestratorFactory.setOrchestrator(orchestrator); // So that you can access the orchestrator wherever you want
 GenerateWordsTask task1 = new GenerateWordsTask(); // Create a task
 orchestrator.acceptTask(task1); // submit the task
 WordCountTask task2 = new WordCountTask(); // Create another task
