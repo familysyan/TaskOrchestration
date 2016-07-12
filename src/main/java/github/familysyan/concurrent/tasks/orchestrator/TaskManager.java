@@ -19,19 +19,19 @@ import github.familysyan.concurrent.tasks.exceptions.DeadlockException;
 import github.familysyan.concurrent.tasks.exceptions.RedundantTaskException;
 import github.familysyan.concurrent.tasks.exceptions.TaskNotFoundException;
 import github.familysyan.concurrent.tasks.executor.TaskExecutor;
+import github.familysyan.concurrent.tasks.internal.InternalTask;
+import github.familysyan.concurrent.tasks.internal.TaskTimeSensitiveWrapper;
 import github.familysyan.concurrent.tasks.internal.TaskWrapper;
 
 public class TaskManager implements Observer{
 	private Map<String, FutureTask<?>> results = new HashMap<String, FutureTask<?>>();
-	private Map<String, TaskWrapper> internalTasks = new HashMap<String, TaskWrapper>();
+	private Map<String, InternalTask> internalTasks = new HashMap<String, InternalTask>();
 	private Set<String> pendingTasks = new HashSet<String>();
 	private TaskExecutor taskExecutor;
 	private DirectedAcyclicGraph<String, DefaultEdge> graph = new DirectedAcyclicGraph<String, DefaultEdge>(DefaultEdge.class);
-	private boolean shutdownExecutorWhenIdle;
 	
-	protected TaskManager(TaskExecutor taskExecutor, boolean shutdownExecutorWhenIdle) {
+	protected TaskManager(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
-		this.shutdownExecutorWhenIdle = shutdownExecutorWhenIdle;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -43,12 +43,17 @@ public class TaskManager implements Observer{
 			throw new RedundantTaskException(task.getUniqueTaskId());
 		}
 		pendingTasks.add(task.getUniqueTaskId());
-		TaskWrapper internalTask = new TaskWrapper(task);
+		InternalTask internalTask = null;
+		if (task.getTimeout() > 0) {
+			internalTask = new TaskTimeSensitiveWrapper(task);
+		} else {
+			internalTask = new TaskWrapper(task);
+		}
 		internalTask.addObserver(this);
 		graph.addVertex(task.getUniqueTaskId());
 		if (tc != null) {
 			for (Task<?> dependency : tc.getDependencies()) {
-				TaskWrapper internalNode = internalTasks.get(dependency.getUniqueTaskId());
+				InternalTask internalNode = internalTasks.get(dependency.getUniqueTaskId());
 				if (internalNode == null) {
 					throw new TaskNotFoundException(dependency.getUniqueTaskId());
 				} else {
@@ -91,23 +96,18 @@ public class TaskManager implements Observer{
 	}
 
 	public void update(Observable o, Object arg) {
-		if (o instanceof TaskWrapper) {
-			TaskWrapper finishedTask = (TaskWrapper) o;
+		if (o instanceof InternalTask) {
+			InternalTask finishedTask = (InternalTask) o;
 			Set<DefaultEdge> incomingEdges = graph.incomingEdgesOf(finishedTask.getTask().getUniqueTaskId());
 			for (DefaultEdge edge : incomingEdges) {
 				String source = graph.getEdgeSource(edge);
-				TaskWrapper task = internalTasks.get(source);
+				InternalTask task = internalTasks.get(source);
 				task.fulfillDependency(finishedTask.getTask().getUniqueTaskId(), arg);
 				if (task.isReady()) {
 					taskExecutor.executeTask(results.get(task.getTask().getUniqueTaskId()));
 				}
 			}
 			pendingTasks.remove(finishedTask.getTask().getUniqueTaskId());
-			if (shutdownExecutorWhenIdle) {
-				if (pendingTasks.isEmpty()) {
-					taskExecutor.shutdown();
-				}
-			}
 			
 		}
 	}

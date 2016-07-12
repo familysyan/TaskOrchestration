@@ -7,5 +7,9 @@ public interface Task<E>{
 	public String getUniqueTaskId();
 	
 	public E execute(List<Object> dependencies);
+	
+	public void failedToComplete();
+	
+	public long getTimeout();
 
 }

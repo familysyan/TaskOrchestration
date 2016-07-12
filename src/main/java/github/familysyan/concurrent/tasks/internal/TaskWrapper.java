@@ -3,22 +3,26 @@ package github.familysyan.concurrent.tasks.internal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Observable;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import github.familysyan.concurrent.tasks.Task;
 
 @SuppressWarnings("rawtypes")
-public class TaskWrapper extends Observable implements Callable{
+public class TaskWrapper extends InternalTask{
 	
 	private Task task;
 	private Set<String> dependencies = new HashSet<String>();
 	private List<Object> dependencyResults = new ArrayList<Object>();
 	private boolean ready = true;
+	private boolean notifyOthers = true;
 	
 	public TaskWrapper(Task<?> task) {
+		this(task, true);
+	}
+	
+	public TaskWrapper(Task<?> task, boolean notifyOthers) {
 		this.task = task;
+		this.notifyOthers = notifyOthers;
 	}
 	
 	public Task getTask() {
@@ -57,14 +61,20 @@ public class TaskWrapper extends Observable implements Callable{
 
 	@SuppressWarnings("unchecked")
 	public Object call() throws Exception {
-		Object result = task.execute(dependencyResults);
-		setChanged();
-		notifyObservers(result);
+		Object result = null;
+		try {
+			result = task.execute(dependencyResults);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
+		if (notifyOthers) {
+			setChanged();
+			notifyObservers(result);
+		}
 		return result;
+		
 	}
 	
-	
-
-	
-
 }

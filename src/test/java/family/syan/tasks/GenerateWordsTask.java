@@ -14,4 +14,16 @@ public class GenerateWordsTask implements Task<String>{
 		return "Hello world";
 	}
 
+	@Override
+	public void failedToComplete() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public long getTimeout() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

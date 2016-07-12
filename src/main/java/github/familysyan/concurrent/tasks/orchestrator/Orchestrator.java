@@ -2,7 +2,6 @@ package github.familysyan.concurrent.tasks.orchestrator;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -17,18 +16,20 @@ public class Orchestrator {
 	private TaskManager taskManager;
 	
 	private Orchestrator(Builder builder) {
-		this.taskExecutor = new TaskExecutor(builder.executorService);
-		this.taskManager = new TaskManager(taskExecutor, builder.shutdownWhenIdle);
+		ExecutorService executor = null;
+		if (builder.executorService != null) {
+			executor = builder.executorService;
+			ExecutorFactory.setExecutor(executor);
+		} else {
+			executor = ExecutorFactory.getExecutor();
+		}
+		this.taskExecutor = new TaskExecutor(executor);
+		this.taskManager = new TaskManager(taskExecutor);
 	}
 	
 	public static class Builder {
 		
-		private boolean shutdownWhenIdle;
 		private ExecutorService executorService;
-		
-		public Builder() {
-			this.executorService = Executors.newCachedThreadPool();
-		}
 		
 		/**
 		 * @param executorService The customized ExecutorService
@@ -36,19 +37,11 @@ public class Orchestrator {
 		public Builder(ExecutorService executorService) {
 			this.executorService = executorService;
 		}
-
-		/**
-		 * Automatically shutdown the orchestrator when all submitted tasks are
-		 * finished. </br>
-		 * Mainly useful for long tasks.</br>
-		 * Use with caution when tasks are short.
-		 * 
-		 * @param shutdownWhenIdle
-		 */
-		public Builder setShutdownWhenIdle(boolean shutdownWhenIdle) {
-			this.shutdownWhenIdle = shutdownWhenIdle;
-			return this;
+		
+		public Builder() {
+			
 		}
+
 		
 		public Orchestrator build() {
 			return new Orchestrator(this);

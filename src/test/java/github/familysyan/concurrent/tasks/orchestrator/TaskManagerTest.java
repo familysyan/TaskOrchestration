@@ -24,6 +24,18 @@ public class TaskManagerTest{
 		@Override
 		public Integer execute(List dependencies) {
 			return 1;
+		}
+
+		@Override
+		public void failedToComplete() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public long getTimeout() {
+			// TODO Auto-generated method stub
+			return 0;
 		}	
 	};
 	
@@ -38,12 +50,24 @@ public class TaskManagerTest{
 		@Override
 		public Integer execute(List dependencies) {
 			return 2;
+		}
+
+		@Override
+		public void failedToComplete() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public long getTimeout() {
+			// TODO Auto-generated method stub
+			return 0;
 		}	
 	};
 	
 	@Test(expected = RedundantTaskException.class)
 	public void testRedundantTaskExecption() {
-		TaskManager manager = new TaskManager(taskExecutor, false);
+		TaskManager manager = new TaskManager(taskExecutor);
 		
 		manager.submitTask(task1, null);
 		manager.submitTask(task1, null);
@@ -51,7 +75,7 @@ public class TaskManagerTest{
 	
 	@Test(expected = TaskNotFoundException.class)
 	public void testTaskNotFoundExecption() {
-		TaskManager manager = new TaskManager(taskExecutor, false);
+		TaskManager manager = new TaskManager(taskExecutor);
 		TaskConfiguration tc = new TaskConfiguration(task1).addDependency(task2);
 		manager.submitTask(task1, tc);
 	}

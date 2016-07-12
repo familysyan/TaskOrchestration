@@ -4,7 +4,7 @@ import java.util.List;
 
 import github.familysyan.concurrent.tasks.Task;
 
-public class LongTask implements Task<Object>{
+public class TimeoutTask implements Task<Object>{
 
 	@Override
 	public String getUniqueTaskId() {
@@ -29,8 +29,7 @@ public class LongTask implements Task<Object>{
 
 	@Override
 	public long getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 100;
 	}
 
 }

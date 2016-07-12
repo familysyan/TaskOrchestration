@@ -4,7 +4,7 @@
 
 	<groupId>github.familysyan</groupId>
 	<artifactId>concurrent-task</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.2-RELEASE</version>
 	<packaging>jar</packaging>
 
 	<name>tasks</name>

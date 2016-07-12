@@ -26,6 +26,18 @@ public class TaskWrapperTest extends TestCase {
 		public Integer execute(List<Object> dependencies) {
 			return 1;
 		}
+
+		@Override
+		public void failedToComplete() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public long getTimeout() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
 		
 	};
 	

@@ -21,7 +21,7 @@ public class TaskExecutor {
 	 */
 	public TaskExecutor(ExecutorService executor) {
 		if (executor == null) {
-			this.executor = Executors.newCachedThreadPool();
+			throw new IllegalArgumentException("Executor must be provided");
 		} else {
 			this.executor = executor;
 		}

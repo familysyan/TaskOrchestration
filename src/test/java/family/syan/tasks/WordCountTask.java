@@ -16,14 +16,28 @@ public class WordCountTask implements Task<Integer>{
 		if (dependencies != null && dependencies.size() > 0) {
 			int count = 0;
 			for (Object dependency : dependencies) {
-				String words = (String) dependency;
-				StringTokenizer t = new StringTokenizer(words);
-				count = count + t.countTokens();
+				if (dependency != null) {
+					String words = (String) dependency;
+					StringTokenizer t = new StringTokenizer(words);
+					count = count + t.countTokens();
+				}
 			}
 			return count;
 		} else {
 			return -1;
 		}
+	}
+
+	@Override
+	public void failedToComplete() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public long getTimeout() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
