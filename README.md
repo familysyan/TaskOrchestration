@@ -17,6 +17,14 @@ public class GenerateWordsTask implements Task<String>{
   	public String execute(List<Object> dependencies) {
   		return "Hello world";
   	}
+  	
+  	public void failedToComplete() {
+  		// what do you want to do if your task get interrupted?
+  	}
+  	
+  	public long getTimeout() { // Add timeout(in milliseconds) to your task. If return 0 then there's no timeout
+		return 1000;
+	}
 
 }
 ```
